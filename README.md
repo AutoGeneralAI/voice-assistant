@@ -2,7 +2,7 @@
 
 English | [简体中文](./README_zh.md)
 
-Functionality Implemented: Voice Assistant. Achieved by calling the API provided by OpenAI official website.
+Functionality Implemented: Voice Assistant. Achieved by calling the API provided by OpenAI.
 
 Online Demo: https://huggingface.co/spaces/AutoGeneralAI/voice-assistant
 
