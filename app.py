@@ -1,0 +1,46 @@
+import gradio as gr
+import openai, subprocess
+import os
+# import config
+# openai.api_key = config.OPENAI_API_KEY
+
+messages = [{"role": "system", "content": 'You are a therapist. Respond to all input in 25 words or less.'}]
+
+def transcribe(key, audio):
+    openai.api_key = key
+    global messages
+
+    audio_filename_with_extension = audio + '.wav'
+    os.rename(audio, audio_filename_with_extension)
+    
+    audio_file = open(audio_filename_with_extension, "rb")
+    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+    messages.append({"role": "user", "content": transcript["text"]})
+
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+
+    system_message = response["choices"][0]["message"]
+    messages.append(system_message)
+
+    #subprocess.call(["say", system_message['content']])
+    print("output: " + system_message['content'] + "\n")
+    
+    chat_transcript = ""
+    for message in messages:
+        if message['role'] != 'system':
+            chat_transcript += message['role'] + ": " + message['content'] + "\n\n"
+
+    return chat_transcript
+
+# ui = gr.Interface(fn=transcribe, inputs=["text", gr.Audio(source="microphone", type="filepath")], outputs="text").launch()
+keyTxt = gr.Textbox(
+                        show_label=True,
+                        placeholder=f"Your API-key...",
+                        type="password",
+                        visible=True,
+                        label="API-Key",
+                    )
+ui = gr.Interface(fn=transcribe, inputs=[keyTxt, gr.Audio(source="microphone", type="filepath")], outputs="text").launch()
+
+ui.launch()
